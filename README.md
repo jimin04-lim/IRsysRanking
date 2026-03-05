@@ -44,6 +44,13 @@
   ```
 - **주요코드**
   ```python
+  cv.imread(path) # 이미지 파일을 읽어와 행렬 데이터로 저장
+  cv.cvtColor(img, cv.COLOR_BGR2GRAY) # 컬러 이미지를 흑백(그레이스케일)으로 변환
+  cv.resize(img, dsize, fx, fy) # 너무 큰 이미지를 화면에 맞게 축소 (배율 지정)
+  cv.cvtColor(gray, cv.COLOR_GRAY2BGR) # 1채널 흑백을 hstack용 3채널로 가짜 변환
+  np.hstack((img1, img2)) # 두 이미지 배열을 가로 방향으로 결합
+  cv.imshow('win', img) # 특정 창에 결과 영상을 출력
+  cv.imwrite('file.jpg', img) # 결과 영상을 파일로 로컬에 저장
   ```
 - **결과물**:
 <img width="2845" height="1675" alt="image" src="https://github.com/user-attachments/assets/52f65b68-9aee-4d6a-98fc-d148ec49061e" />
@@ -112,6 +119,12 @@
   ```
 - **주요코드**
   ```python
+  cv.namedWindow('name') # 마우스 이벤트를 받을 고정된 창 생성
+  cv.setMouseCallback('name', callback) # 마우스 움직임/클릭 감지 함수 등록
+  cv.circle(img, (x, y), r, color, -1) # (x,y) 좌표에 붓 크기(r)만큼 원 그리기
+  cv.waitKey(1) # 1ms 동안 키 입력을 대기 (루프 내에서 실시간 감지)
+  ord('+') / ord('-') # 키보드 문자를 아스키 코드로 변환하여 비교
+  min(15, size + 1) / max(1, size - 1) # 붓 크기가 범위를 벗어나지 않게 제한
   ```
 - **결과물**: 
 <img width="2835" height="1799" alt="image" src="https://github.com/user-attachments/assets/88470528-8b0f-4e0d-b065-94e54aa3b6f1" />
@@ -187,6 +200,11 @@
   ```
 - **주요코드**
   ```python
+  img.copy() # 원본을 훼손하지 않기 위해 사본 생성 (사각형 시각화용)
+  cv.EVENT_LBUTTONDOWN # 마우스 왼쪽 버튼을 누른 순간의 좌표 저장
+  cv.rectangle(img, pt1, pt2, color, thickness) # 드래그 중인 사각형 영역 표시
+  img[y1:y2, x1:x2] # (핵심) 넘파이 슬라이싱을 이용해 관심영역(ROI)만 잘라내기
+  cv.EVENT_LBUTTONUP # 마우스를 떼는 순간 최종 ROI 영역 확정
   ```
 - **결과물**:
 <img width="2807" height="1651" alt="image" src="https://github.com/user-attachments/assets/464e49c5-f099-4f86-aa9b-882522d9c916" />
