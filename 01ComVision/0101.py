@@ -3,7 +3,7 @@ import numpy as np # 영상 결합(hstack)을 위해 numpy 임포트
 import sys # 프로그램 종료 기능을 위해 임포트
 
 # 1. 이미지 로드
-img_color = cv.imread(r'C:\Users\a0105\Documents\01ComVision\girl_laughing.jpg')
+img_color = cv.imread('girl_laughing.jpg')
 
 # 이미지를 불러오지 못했을 경우 프로그램 종료
 if img_color is None:

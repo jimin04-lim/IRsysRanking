@@ -28,7 +28,7 @@ def draw_circle(event, x, y, flags, param):
         is_drawing = False # 그리기 모드 비활성화
 
 # 배경이 될 이미지 로드 (경로 주의!)
-img = cv.imread("C:/Users/a0105/Documents/01ComVision/girl_laughing.jpg") # 이미지 불러오기 
+img = cv.imread("girl_laughing.jpg") # 이미지 불러오기 
 cv.namedWindow('Painting') # 창 이름 설정
 cv.setMouseCallback('Painting', draw_circle) # 마우스 콜백 함수 등록 
 

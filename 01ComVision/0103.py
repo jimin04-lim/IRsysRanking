@@ -31,7 +31,7 @@ def on_mouse(event, x, y, flags, param):
             cv.imshow('Cropped ROI', roi_img) # 추출된 영역 별도 창 표시
 
 # 이미지 로드 (경로 주의!) 
-img = cv.imread("C:/Users/a0105/Documents/01ComVision/girl_laughing.jpg")
+img = cv.imread("girl_laughing.jpg")
 img_copy = img.copy() # 수정을 위한 이미지 복사본
 
 cv.imshow('ROI Selection', img_copy) # 초기 화면 출력 
