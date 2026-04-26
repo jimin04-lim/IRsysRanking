@@ -1,5 +1,4 @@
-print("--프로그램 실행 시작--")
-
+import sys
 import nltk
 import pandas as pd
 import re
@@ -9,8 +8,8 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
+# 소문자 변환, 문장 부호 제거, 토큰화, 불용어 제거, 표제어 추출을 수행
 def preprocess_text(text):
-    """소문자 변환, 문장 부호 제거, 토큰화, 불용어 제거, 표제어 추출을 수행합니다."""
     text = str(text).lower()
     text = re.sub(r'[.,\-;:\'"]', ' ', text)
     tokens = word_tokenize(text)
@@ -19,8 +18,9 @@ def preprocess_text(text):
     lemmas = [lemmatizer.lemmatize(t) for t in tokens if t not in stop_words and t.isalnum()]
     return lemmas
 
+# Pandas를 사용하여 XML을 파싱하고 질문과 답변을 하나의 문서로 병합
 def load_and_merge_data(xml_file):
-    """Pandas를 사용하여 XML을 파싱하고 질문과 답변을 하나의 문서로 병합합니다."""
+
     df = pd.read_xml(xml_file)
     
     # 1. 질문(PostTypeId=1)과 답변(PostTypeId=2) 분리
@@ -50,16 +50,16 @@ def load_and_merge_data(xml_file):
         
     return docs
 
+# Inverted Index를 생성
 def build_inverted_index(docs):
-    """Inverted Index를 생성합니다."""
     inverted_index = defaultdict(lambda: defaultdict(int))
     for doc_id, tokens in docs.items():
         for token in tokens:
             inverted_index[token][doc_id] += 1
     return inverted_index
 
+# 단순 TF 기반 검색을 수행
 def search_tf(query, inverted_index):
-    """단순 TF 스코어링 기반 검색을 수행합니다."""
     query_tokens = preprocess_text(query)
     scores = defaultdict(int)
     
@@ -72,16 +72,58 @@ def search_tf(query, inverted_index):
     return ranked_docs[:5]
 
 if __name__ == "__main__":
-    print("데이터 파싱 및 역색인 구축 중...")
+    # 1. 커맨드 라인으로 쿼리 입력받기
+    if len(sys.argv) > 1:
+        query = " ".join(sys.argv[1:])
+    else:
+        query = input("검색할 쿼리 입력: ")
+
+    print("데이터 수집중...")
     docs = load_and_merge_data('Posts.xml')
     inverted_index = build_inverted_index(docs)
-    total_docs = len(docs)
     
-    # 과제 명세 Table 1에 맞게 쿼리 리스트를 채워주세요 (예시 추가)
-    queries = ["black coffee", "espresso machine"] 
+    # 입력받은 쿼리 전처리 (소문자화, 불용어 제거 등)
+    query_tokens = preprocess_text(query)
     
-    for q in queries:
-        print(f"\n[Query]: {q}")
-        results = search_tf(q, inverted_index) 
+    # 2. 쿼리 Term들의 Inverted Index (출현 횟수) 출력
+    print("\n" + "="*50)
+    print(f"[Query Terms Inverted Index]")
+    
+    # 쿼리 내 중복 단어 출력을 방지하기 위해 set() 사용
+    unique_tokens = set(query_tokens)
+    if not unique_tokens:
+        print("Error: 유효한 검색어 없음")
+    else:
+        for token in unique_tokens:
+            if token in inverted_index:
+                # 딕셔너리 형태로 가독성 좋게 출력: {DocID: TF 빈도, ...}
+                posting_list = dict(inverted_index[token])
+                print(f" - '{token}': {posting_list}")
+            else:
+                print(f" - '{token}': 역색인 사전에 존재하지 않습니다.")
+    print("="*50)
+
+    # 3. 문서 랭킹 순서 및 점수 출력
+    print(f"\n[Ranking Result-5]: '{query}'")
+    results = search_tf(query, inverted_index) 
+    
+    if not results:
+        print("일치하는 문서가 없습니다.")
+    else:
         for rank, (doc_id, score) in enumerate(results, 1):
-            print(f"Rank {rank}: DocID {doc_id}, Score {score:.4f}")
+            print(f"Rank {rank}: DocID {doc_id}, Score {score}")
+            
+        print("\n[Ranking Doc Contents]")
+        for rank, (doc_id, score) in enumerate(results, 1):
+                
+            # docs[doc_id]에는 이미 전처리(토큰화, 불용어제거 등)가 완료된 리스트가 들어있습니다.
+            tokenized_words = docs[doc_id]
+                
+            # 앞 20개의 토큰만 추출하여 공백으로 연결
+            truncated_content = " ".join(tokenized_words[:20])
+                
+            # 전체 토큰이 20개가 넘으면 뒤에 생략 기호(...) 추가
+            if len(tokenized_words) > 20:
+                truncated_content += " ..."
+                    
+            print(f"Rank {rank}, DocID {doc_id}'s contents: \n{truncated_content}")
